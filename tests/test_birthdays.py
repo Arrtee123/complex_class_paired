@@ -60,8 +60,17 @@ def test_mark_done():
 
 def test_mark_done_with_reminder_reset():
     bd = Birthdays()
+    bd.birthdays.append({"name": "Rachel", "birthday": date(1989, 1, 11), "sent": True,  "ages_sent":[35]})
     date_ = date(1999, 2, 10)
     bd.add_birthday("Hassan", date_)
     bd.mark_done("Hassan")
     bd.reminder()
-    assert bd.birthdays == [{"name": "Hassan", "birthday": date(1999, 2, 10), "sent": True,  "ages_sent":[25]}]
+    assert bd.birthdays == [{"name": "Rachel", "birthday": date(1989, 1, 11), "sent": False,  "ages_sent":[35]}, {"name": "Hassan", "birthday": date(1999, 2, 10), "sent": True,  "ages_sent":[25]}]
+
+
+def test_mark_done_with_reminder_reset_and_age_sent_added():
+    bd = Birthdays()
+    bd.birthdays.append({"name": "Rachel", "birthday": date(1989, 2, 11), "sent": False,  "ages_sent":[34]})
+    bd.mark_done("Rachel")
+    bd.reminder()
+    assert bd.birthdays == [{"name": "Rachel", "birthday": date(1989, 2, 11), "sent": True,  "ages_sent":[34, 35]}]
