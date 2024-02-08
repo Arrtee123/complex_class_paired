@@ -1,5 +1,5 @@
-import datetime
-import dateutil
+from datetime import date
+from dateutil.relativedelta import *
 
 class Birthdays:
 
@@ -13,7 +13,7 @@ class Birthdays:
         # Side-effects:
         #     Add a dictionary item containing a nested dictionary in the following format.        
         #     {name: name, birthday: birthday, sent: False}
-        self.birthdays.append({"name": name, "birthday": birthday, "sent": False})
+        self.birthdays.append({"name": name, "birthday": birthday, "sent": False, "ages_sent":[]})
         return None
 
     def edit_birthday(self, name, birthday):
@@ -30,40 +30,35 @@ class Birthdays:
         for item in self.birthdays:
             if item["name"] == name:
                 item["name"] = new_name
-        pass
-
-    def reminder(self, days=14):
-        # Parameters:
-        #     days(optional): integer (defaults to 14 days)
-        # Returns:
-        #     A list of dictionary items containing friends with birthdays coming up in the given time
-        today = datetime.now()
-        difference = relativedelta(today,date_of_birth).days
-
-def age_checker(dob):
-    today = datetime.now()
-    try:
-        date_of_birth = datetime.strptime(dob, "%Y-%m-%d")
-    except:
-        raise Exception("The date provided is in an invalid format or type")
-    date_of_birth = datetime.strptime(dob, "%Y-%m-%d")
-    
-    difference = relativedelta(today,date_of_birth).years
-    if difference >=16:
-        return "Access is granted"
-        
-        
 
     def age(self, name):
-        # Parameters:
-        #     name: string
-        # Returns:
-        #     age (int) of friend with given name
-        pass
+        for item in self.birthdays:
+            if name == item["name"]:
+                difference =  relativedelta(date.today(),item["birthday"])
+                return difference.years +1
+        
+
+    def reminder(self, reminder_days=14):
+        reminder_list = []
+        reminder_period = date.today() + relativedelta(days=reminder_days)
+        for item in self.birthdays:
+            birthday = item["birthday"]
+            difference =  relativedelta(reminder_period,birthday)
+            if (difference.months == 0 and difference.days <=14):
+                reminder_list.append(item)
+            upcoming_age = self.age(item['name'])
+            if upcoming_age not in item["ages_sent"]:
+                item["sent"] = False
+
+        return reminder_list
+            
+            
+
 
     def mark_done(self, name):
-        # Parameters:
-        #     name: string
-        # Side effects:
-        #     Change done key to True for given name
-        pass
+        for item in self.birthdays:
+            if name == item["name"]:
+                upcoming_age = self.age(name)
+                item["ages_sent"].append(upcoming_age)
+                item["sent"] = True
+        
